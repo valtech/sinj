@@ -10,3 +10,5 @@ Sitecore\*
 *.user
 *.zip
 *.bat
+Example\*
+Sinj.Website.sln
