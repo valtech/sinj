@@ -2,9 +2,26 @@
 	return function () {
 		var database = $sc.db;
 
-		return [database.GetItem(id)];
+		var item = database.GetItem(id);
+
+		if (item == null) {
+			return [];
+		}
+
+		return [item];
 	};
 };
+
+var scValue = function (value) {
+	if (value === true) {
+		value = "1";
+	}
+	else if (value === false) {
+		value = "";
+	}
+
+	return value;
+}
 
 var scSetField = function (name, value) {
 	return function (item) {
@@ -12,7 +29,7 @@ var scSetField = function (name, value) {
 
 		var field = item.Fields.Item.get(name);
 
-		field.SetValue(value, true);
+		field.SetValue(scValue(value), true);
 
 		item.Editing.AcceptChanges();
 	};
@@ -31,37 +48,92 @@ var scSetFields = function (values) {
 		for (var name in values) {
 			var field = fields.Item.get(name);
 
-			field.SetValue(values[name], true);
+			var value = values[name];
+
+			field.SetValue(scValue(values[name]), true);
 		}
 
 		item.Editing.AcceptChanges();
 	};
 };
 
-var scUpdateItem = function (update) {
-	var items = update.forItems();
+var scUpdateItem = function (packet) {
+	var items = packet.item();
 
 	for (var j = 0; j < items.length; j++) {
 		var item = items[j];
 
 		$sc.log("Updating item '" + item.Name + "'");
 
-		scSetFields(update.setFields)(item);
+		scSetFields(packet.fields)(item);
 	}
 };
 
-var scUpdateItems = function (updates) {
-	for (var i = 0; i < updates.length; i++) {
-		var update = updates[i];
+var scUpdateItems = function (packets) {
+	for (var i = 0; i < packets.length; i++) {
+		var packet = packets[i];
 
-		scUpdateItem(update);
+		scUpdateItem(packet);
 	}
 };
 
-var scInsertItem = function (update) {
-	var parents = update.parents();
+var scInsertItems = function (packets) {
+	for (var i = 0; i < packets.length; i++) {
+		var packet = packets[i];
+
+		scInsertItem(packet);
+	}
+};
+
+var scInsertItem = function (packet) {
+	if (packet.name == null) {
+		throw "Name not specified for item to create.";
+	}
+
+	var parents = packet.parent();
+
+	for (var j = 0; j < parents.length; j++) {
+		var parent = parents[j];
+
+		var template = packet.template();
+
+		var item;
+
+		if (packet.id == null) {
+			item = parent.Add(packet.name, template);
+		}
+		else {
+			item = $scItemManager.AddFromTemplate(packet.name, template.ID, parent, new $scID(packet.id));
+
+			if (item.Name != packet.name) {
+				item.Editing.BeginEdit();
+
+				item.Name = packet.name;
+
+				item.Editing.AcceptChanges();
+			}
+		}
+
+		scSetFields(packet.fields)(item);
+	}
+};
+
+var scDeleteItem = function (packet) {
+	var items = packet.item();
 
 	for (var j = 0; j < items.length; j++) {
-		var parent = parents[j];
+		var item = items[j];
+
+		if (item != null) {
+			item.Delete();
+		}
+	}
+};
+
+var scDeleteItems = function (packets) {
+	for (var i = 0; i < packets.length; i++) {
+		var packet = packets[i];
+
+		scDeleteItem(packet);
 	}
 };

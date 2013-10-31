@@ -35,7 +35,11 @@ namespace Sinj
 			using (ScriptEngine engine = new JScriptEngine(WindowsScriptEngineFlags.EnableDebugging))
 			{
 				engine.AddHostObject("$sc", new PushContext());
-
+				engine.AddHostType("$scItemManager", typeof(Sitecore.Data.Managers.ItemManager));
+				engine.AddHostType("$scID", typeof(Sitecore.Data.ID));
+				engine.AddHostType("$scTemplateIDs", typeof(Sitecore.TemplateIDs));
+				engine.AddHostType("$scTemplateFieldIDs", typeof(Sitecore.TemplateFieldIDs));
+				
 				try
 				{
 					using (new Sitecore.SecurityModel.SecurityDisabler())
