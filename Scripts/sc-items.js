@@ -1,14 +1,28 @@
-﻿var scItem = function (id) {
-	return function () {
-		var database = $sc.db;
+﻿var scItem = function (id, language, version) {
+	var database = $sc.db;
 
-		var item = database.GetItem(id);
+	var item;
 
-		if (item == null) {
-			return [];
-		}
+	if (language == null) {
+		item = database.GetItem(id);
+	}
+	else if (version == null) {
+		item = database.GetItem(id, $scLanguage.Parse(language));
+	}
+	else {
+		item = database.GetItem(id, $scLanguage.Parse(language), new $scVersion(version));
+	}
 
-		return [item];
+	if (item == null) {
+		return [];
+	}
+
+	return item;
+};
+
+var scItemQuery = function (id) {
+	return function (language, version) {
+		return [scItem(id, language, version)];
 	};
 };
 
@@ -24,15 +38,7 @@ var scValue = function (value) {
 }
 
 var scSetField = function (name, value) {
-	return function (item) {
-		item.Editing.BeginEdit();
-
-		var field = item.Fields.Item.get(name);
-
-		field.SetValue(scValue(value), true);
-
-		item.Editing.AcceptChanges();
-	};
+	return scSetFields({name: name, value: value});
 };
 
 var scSetFields = function (values) {
@@ -41,29 +47,54 @@ var scSetFields = function (values) {
 			return;
 		}
 
-		item.Editing.BeginEdit();
-
+		//PERF: if fields up to date, skip...
 		var fields = item.Fields;
+
+		var changed = false;
 
 		for (var name in values) {
 			var field = fields.Item.get(name);
 
-			var value = values[name];
+			if (field != null) {
+				if (scValue(values[name]) != field.Value) {
+					changed = true;
 
-			field.SetValue(scValue(values[name]), true);
+					break;
+				}
+			}
 		}
 
-		item.Editing.AcceptChanges();
+		if (changed) {
+			$sc.log("Fields changed on '" + item.Paths.Path + "'");
+
+			item.Editing.BeginEdit();
+
+			for (var name in values) {
+				var field = fields.Item.get(name);
+
+				if (field != null) {
+					var value = scValue(values[name]);
+
+					if (scValue(values[name]) != field.Value) {
+						field.SetValue(value, true);
+					}
+				}
+			}
+
+			item.Editing.EndEdit();
+		}
 	};
 };
 
 var scUpdateItem = function (packet) {
+	//TODO: languages
+
 	var items = packet.item();
 
 	for (var j = 0; j < items.length; j++) {
 		var item = items[j];
 
-		$sc.log("Updating item '" + item.Name + "'");
+		$sc.log("Updating item '" + item.Paths.Path + "'");
 
 		scSetFields(packet.fields)(item);
 	}
@@ -85,46 +116,53 @@ var scInsertItems = function (packets) {
 	}
 };
 
+//for languages need destination of parent to be language
+
 var scInsertItem = function (packet) {
+	//TODO: languages
+
 	if (packet.name == null) {
 		throw "Name not specified for item to create.";
 	}
 
-	var parents = packet.parent();
+	var parent = scItem(packet.parent);
 
-	for (var j = 0; j < parents.length; j++) {
-		var parent = parents[j];
+	var template = $sc.db.GetTemplate(packet.template);
 
-		var template = packet.template();
+	var item;
 
-		var item;
+	$sc.log("Inserting item '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
 
-		if (packet.id == null) {
-			item = parent.Add(packet.name, template);
-		}
-		else {
-			item = $scItemManager.AddFromTemplate(packet.name, template.ID, parent, new $scID(packet.id));
-
-			if (item.Name != packet.name) {
-				item.Editing.BeginEdit();
-
-				item.Name = packet.name;
-
-				item.Editing.AcceptChanges();
-			}
-		}
-
-		scSetFields(packet.fields)(item);
+	//PERF: if item exists, skip...
+	if (packet.id == null) {
+		item = parent.Add(packet.name, template);
 	}
+	else {
+		item = $scItemManager.AddFromTemplate(packet.name, template.ID, parent, new $scID(packet.id));
+	}
+
+	if (item.Name != packet.name) {
+		item.Editing.BeginEdit();
+
+		item.Name = packet.name;
+
+		item.Editing.EndEdit();
+	}
+
+	scSetFields(packet.fields)(item);
 };
 
 var scDeleteItem = function (packet) {
+	//TODO: languages
+
 	var items = packet.item();
 
 	for (var j = 0; j < items.length; j++) {
 		var item = items[j];
 
 		if (item != null) {
+			$sc.log("Deleting item '" + parent.Paths.Path + "'");
+
 			item.Delete();
 		}
 	}

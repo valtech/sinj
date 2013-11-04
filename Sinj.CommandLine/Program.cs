@@ -1,5 +1,6 @@
 ﻿using Microsoft.ClearScript;
 using Microsoft.ClearScript.Windows;
+//using Microsoft.ClearScript.V8;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,7 @@ namespace Sinj.CommandLine
 		{
 			string[] paths = args;
 
+            //new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging)
 			using (ScriptEngine engine = new JScriptEngine(WindowsScriptEngineFlags.EnableDebugging))
 			{
 				engine.AddHostObject("$cmd", new ProgramContext());
