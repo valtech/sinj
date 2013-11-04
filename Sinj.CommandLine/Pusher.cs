@@ -20,7 +20,7 @@ namespace Sinj.CommandLine
 			_scripts = scripts;
 		}
 
-		public string Execute()
+		public void Execute()
 		{
 			HttpWebRequest request = WebRequest.CreateHttp(_endpoint);
 
@@ -28,7 +28,7 @@ namespace Sinj.CommandLine
 
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-			return ReadResponse(response);
+			ReadResponse(response);
 		}
 
 		private string BuildScript()
@@ -65,20 +65,21 @@ namespace Sinj.CommandLine
 			}
 		}
 
-		private string ReadResponse(HttpWebResponse response)
+		private void ReadResponse(HttpWebResponse response)
 		{
-			string responseString = null;
+			byte[] buffer = new byte[64];
 
 			using (Stream responseStream = response.GetResponseStream())
 			{
-				StreamReader responseReader = new StreamReader(responseStream, Encoding.ASCII);
+				int length;
 
-				responseString = responseReader.ReadToEnd();
+				while ((length = responseStream.Read(buffer, 0, buffer.Length)) > 0)
+				{
+					string text = Encoding.ASCII.GetString(buffer, 0, length);
 
-				responseStream.Close();
+					Console.Write(text);
+				}
 			}
-
-			return responseString;
 		}
 	}
 }

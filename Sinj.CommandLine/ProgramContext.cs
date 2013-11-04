@@ -14,9 +14,7 @@ namespace Sinj.CommandLine
 		{
 			Pusher executer = new Pusher(endpoint, EnumerateScripts(scripts).ToArray());
 
-			string response = executer.Execute();
-
-			Console.WriteLine(response);
+			executer.Execute();
 		}
 
 		private static IEnumerable<string> EnumerateScripts(dynamic scripts)

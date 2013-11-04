@@ -12,6 +12,7 @@ namespace Sinj
 	public class PushContext
 	{
 		private string _database = "master";
+		private DateTime _start = DateTime.Now;
 
 		[ScriptMember(Name = "db")]
 		public Sitecore.Data.Database Database
@@ -28,6 +29,12 @@ namespace Sinj
 			_database = database;
 		}
 
+		[ScriptMember(Name = "id")]
+		public string Id()
+		{
+			return Guid.NewGuid().ToString();
+		}
+
 		[ScriptMember(Name = "log")]
 		public void Log(string message)
 		{
@@ -35,7 +42,11 @@ namespace Sinj
 
 			HttpResponse response = context.Response;
 
-			response.Write(message + "\r\n");
+			TimeSpan duration = DateTime.Now - _start;
+
+			response.Write(String.Format("{1:D4} - {0}\r\n", message, (int)duration.TotalSeconds));
+
+			response.Flush();
 		}
 	}
 }
