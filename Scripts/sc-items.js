@@ -42,48 +42,58 @@ var scSetField = function (name, value) {
 };
 
 var scSetFields = function (values) {
-	return function (item) {
-		if (values == null) {
-			return;
-		}
+    return function (item) {
+        if (values == null) {
+            return;
+        }
 
-		//PERF: if fields up to date, skip...
-		var fields = item.Fields;
+        var fields = item.Fields;
 
-		var changed = false;
+        var updates = [];
 
-		for (var name in values) {
-			var field = fields.Item.get(name);
+        for (var name in values) {
+            var field = fields.Item.get(name);
 
-			if (field != null) {
-				if (scValue(values[name]) != field.Value) {
-					changed = true;
+            var value = scValue(values[name]);
 
-					break;
-				}
-			}
-		}
+            if (field == null) {
+                field = fields.Item.get("__" + name);
 
-		if (changed) {
-			$sc.log("Fields changed on '" + item.Paths.Path + "'");
+                if (field == null) {
+                    if (name == "Insert Options") {
+                        field = fields.Item.get("__Masters");
+                        $sc.log("Switching to masters");
+                    }
+                }
+            }
 
-			item.Editing.BeginEdit();
+            if (field != null) {
+                if (value != field.Value) {
+                    updates.push({
+                        field: field,
+                        value: value
+                    });
+                }
+            }
+            else {
+                $sc.log("Field '" + name + "' does not exist for item + '" + item.Paths.Path + "'.");
+            }
+        }
 
-			for (var name in values) {
-				var field = fields.Item.get(name);
+        if (updates.length > 0) {
+            $sc.log("Fields changed on '" + item.Paths.Path + "'");
 
-				if (field != null) {
-					var value = scValue(values[name]);
+            item.Editing.BeginEdit();
 
-					if (scValue(values[name]) != field.Value) {
-						field.SetValue(value, true);
-					}
-				}
-			}
+            for (var i = 0; i < updates.length; i++) {
+                var update = updates[i];
 
-			item.Editing.EndEdit();
-		}
-	};
+                update.field.SetValue(update.value, true);
+            }
+
+            item.Editing.EndEdit();
+        }
+    };
 };
 
 var scUpdateItem = function (packet) {
@@ -119,37 +129,41 @@ var scInsertItems = function (packets) {
 //for languages need destination of parent to be language
 
 var scInsertItem = function (packet) {
-	//TODO: languages
+    //TODO: languages
 
-	if (packet.name == null) {
-		throw "Name not specified for item to create.";
-	}
+    if (packet.name == null) {
+        throw "Name not specified for item to create.";
+    }
 
-	var parent = scItem(packet.parent);
+    var parent = scItem(packet.parent);
 
-	var template = $sc.db.GetTemplate(packet.template);
+    var template = scTemplate(packet.template);
 
-	var item;
+    if (template == null) {
+        throw "Could not find template '" + packet.template + "'";
+    }
 
-	$sc.log("Inserting item '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
+    var item;
 
-	//PERF: if item exists, skip...
-	if (packet.id == null) {
-		item = parent.Add(packet.name, template);
-	}
-	else {
-		item = $scItemManager.AddFromTemplate(packet.name, template.ID, parent, new $scID(packet.id));
-	}
+    $sc.log("Inserting item '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
 
-	if (item.Name != packet.name) {
-		item.Editing.BeginEdit();
+    //PERF: if item exists, skip...
+    if (packet.id == null) {
+        item = parent.Add(packet.name, template);
+    }
+    else {
+        item = $scItemManager.AddFromTemplate(packet.name, template.ID, parent, new $scID(packet.id));
+    }
 
-		item.Name = packet.name;
+    if (item.Name != packet.name) {
+        item.Editing.BeginEdit();
 
-		item.Editing.EndEdit();
-	}
+        item.Name = packet.name;
 
-	scSetFields(packet.fields)(item);
+        item.Editing.EndEdit();
+    }
+
+    scSetFields(packet.fields)(item);
 };
 
 var scDeleteItem = function (packet) {

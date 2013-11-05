@@ -12,3 +12,4 @@ Sitecore\*
 *.bat
 Example\*
 Sinj.Website.sln
+*.nupkg

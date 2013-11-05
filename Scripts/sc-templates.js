@@ -1,3 +1,17 @@
+var scTemplate = function (id) {
+    var template = $sc.db.GetTemplate(id);
+
+    if (template == null) {
+        var item = $sc.db.GetItem(id);
+
+        if (item != null) {
+            template = $sc.db.GetTemplate(item.ID);
+        }
+    }
+
+    return template;
+}
+
 var scInsertTemplates = function (packets) {
 	for (var i = 0; i < packets.length; i++) {
 		var packet = packets[i];
@@ -7,69 +21,71 @@ var scInsertTemplates = function (packets) {
 };
 
 var scInsertTemplate = function (packet) {
-	if (packet.name == null) {
-		throw "Name not specified for template to create.";
-	}
+    if (packet.name == null) {
+        throw "Name not specified for template to create.";
+    }
 
-	var parent = $sc.db.GetItem(packet.parent);
+    var parent = $sc.db.GetItem(packet.parent);
 
-	if (parent == null) {
-		throw "Template '" + packet.parent + "'' not found.";
-	}
+    if (parent == null) {
+        throw "Template '" + packet.parent + "'' not found.";
+    }
 
-	var parentBranch = $sc.db.Branches["__Template"];
+    var parentBranch = $sc.db.Branches["__Template"];
 
-	var item;
+    var item;
 
-	if (packet.id != null) {
-		item = $sc.db.GetTemplate(packet.id);
-	}
+    if (packet.id != null) {
+        item = $sc.db.GetTemplate(packet.id);
+    }
 
-	$sc.log("Inserting template '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
+    $sc.log("Inserting template '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
 
-	if (item == null) {
-		//PERF: if template exists, skip...
-		if (parentBranch == null) {
-			var parentTemplate = $sc.db.Templates.Item.get($scTemplateIDs.Template);
-			
-			if (packet.id == null) {
-				item = parent.Add(packet.name, parentTemplate);
-			}
-			else {
-				item = $scItemManager.AddFromTemplate(packet.name, parentTemplate.ID, parent, new $scID(packet.id));
-			}
-		}
-		else {
-			if (packet.id == null) {
-				item = parent.Add(packet.name, parentBranch);
-			}
-			else {
-				item = $scItemManager.AddFromTemplate(packet.name, parentBranch.ID, parent, new $scID(packet.id));
-			}
-		}
-	}
+    if (item == null) {
+        //PERF: if template exists, skip...
+        if (parentBranch == null) {
+            var parentTemplate = $sc.db.Templates.Item.get($scTemplateIDs.Template);
 
-	if (item.Name != packet.name) {
-		item.Editing.BeginEdit();
+            if (packet.id == null) {
+                item = parent.Add(packet.name, parentTemplate);
+            }
+            else {
+                item = $scItemManager.AddFromTemplate(packet.name, parentTemplate.ID, parent, new $scID(packet.id));
+            }
+        }
+        else {
+            if (packet.id == null) {
+                item = parent.Add(packet.name, parentBranch);
+            }
+            else {
+                item = $scItemManager.AddFromTemplate(packet.name, parentBranch.ID, parent, new $scID(packet.id));
+            }
+        }
+    }
 
-		item.Name = packet.name;
+    if (item.Name != packet.name) {
+        item.Editing.BeginEdit();
 
-		item.Editing.EndEdit();
-	}
+        item.Name = packet.name;
 
-	var id =item.ID.Guid.ToString();
+        item.Editing.EndEdit();
+    }
 
-	for (var j = 0; j < packet.sections.length; j++) {
-		packet.sections[j].template = id;
-	}
+    var id = item.ID.Guid.ToString();
 
-	scInsertTemplateSections(packet.sections);
+    if (packet.sections) {
+        for (var j = 0; j < packet.sections.length; j++) {
+            packet.sections[j].template = id;
+        }
 
-	packet.standardValues.template = id;
+        scInsertTemplateSections(packet.sections);
+    }
 
-	scInsertStandardValues(packet.standardValues);
+    if (packet.standardValues) {
+        packet.standardValues.template = id;
 
-	
+        scInsertStandardValues(packet.standardValues);
+    }
 };
 
 var scUpdateTemplate = function (packet) {
@@ -113,7 +129,7 @@ var scInsertTemplateSection = function (packet) {
 
 	for (var j = 0; j < packet.fields.length; j++) {
 		packet.fields[j].template = packet.template;
-		packet.fields[j].sectionId = item.ID.Guid.ToString();
+		packet.fields[j].section = item.ID.Guid.ToString();
 	}
 
 	scInsertTemplateFields(packet.fields);
@@ -130,7 +146,7 @@ var scInsertTemplateFields = function (packets) {
 var scInsertTemplateField = function (packet) {
 	var template = $sc.db.GetTemplate(packet.template);
 
-	var section = template.GetSection(new $scID(packet.sectionId));
+	var section = template.GetSection(new $scID(packet.section));
 
 	var item;
 
@@ -158,10 +174,10 @@ var scInsertTemplateField = function (packet) {
 		if (name == 'id') {
 			continue;
 		}
-		else if (name == 'templateId') {
+		else if (name == 'template') {
 			continue;
 		}
-		else if (name == 'sectionId') {
+		else if (name == 'section') {
 			continue;
 		}
 		else if (name == 'name') {

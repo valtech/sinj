@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata>
+		<id>Sinj-CommandLine</id>
+		<version>1.0.0</version>
+		<authors>True Clarity</authors>
+		<requireLicenseAcceptance>false</requireLicenseAcceptance>
+		<description>Sitecore Ninja JavaScript - Command Line Tools.</description>
+		<frameworkAssemblies>
+			
+		</frameworkAssemblies>
+		
+	</metadata>
+	<files>
+		<file src="..\Sinj.CommandLine\bin\Debug\Sinj.CommandLine.exe" target="tools" />
+		<file src="..\Sinj.CommandLine\bin\Debug\ClearScript.dll" target="tools" />
+		<file src="..\Scripts\sc-items.js" target="tools" />
+		<file src="..\Scripts\sc-templates.js" target="tools" />
+	</files>
+</package>
