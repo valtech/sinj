@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -22,13 +24,20 @@ namespace Sinj.CommandLine
 
 		public void Execute()
 		{
-			HttpWebRequest request = WebRequest.CreateHttp(_endpoint);
+			ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertficate;
+
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(_endpoint);
 
 			PostScript(request);
 
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
 			ReadResponse(response);
+		}
+
+		private static bool ValidateServerCertficate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
+		{
+			return true;
 		}
 
 		private string BuildScript()

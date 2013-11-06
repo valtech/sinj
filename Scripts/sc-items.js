@@ -34,7 +34,7 @@ var scValue = function (value) {
 		value = "";
 	}
 
-	return value;
+	return "" + value;
 }
 
 var scSetField = function (name, value) {

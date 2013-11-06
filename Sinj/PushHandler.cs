@@ -41,27 +41,34 @@ namespace Sinj
 				engine.AddHostType("$scID", typeof(Sitecore.Data.ID));
 				engine.AddHostType("$scTemplateIDs", typeof(Sitecore.TemplateIDs));
 				engine.AddHostType("$scTemplateFieldIDs", typeof(Sitecore.TemplateFieldIDs));
-				
-				try
+
+				if (scripts != null && paths != null)
 				{
-					using (new Sitecore.SecurityModel.SecurityDisabler())
+					try
 					{
-						foreach (string script in scripts)
+						using (new Sitecore.SecurityModel.SecurityDisabler())
 						{
-							pathIndex++;
+							foreach (string script in scripts)
+							{
+								pathIndex++;
 
-							engine.Execute(script);
+								engine.Execute(script);
+							}
 						}
+
+						TimeSpan duration = DateTime.Now - start;
+
+						context.Response.Write(String.Format("Completed in {0} seconds.", duration.TotalSeconds));
 					}
-
-					TimeSpan duration = DateTime.Now - start;
-
-					context.Response.Write(String.Format("Completed in {0} seconds.", duration.TotalSeconds));
+					catch (ScriptEngineException e)
+					{
+						context.Response.Write("Error in script file' " + paths[pathIndex] + "'. ");
+						context.Response.Write(e.ErrorDetails + "\r\n\r\n" + e.InnerException + "\r\n\r\n");
+					}
 				}
-				catch (ScriptEngineException e)
+				else
 				{
-					context.Response.Write("Error in script file' " + paths[pathIndex] + "'. ");
-					context.Response.Write(e.ErrorDetails + "\r\n\r\n" + e.InnerException + "\r\n\r\n");
+					engine.Execute("$sc.log('Hello from Sinj...')");
 				}
 			}
 		}
