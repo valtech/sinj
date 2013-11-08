@@ -86,6 +86,12 @@ var scInsertTemplate = function (packet) {
 
         scInsertStandardValues(packet.standardValues);
     }
+
+    if (packet.fields) {
+    	item = $sc.db.GetItem(item.ID);
+
+        scSetFields(packet.fields)(item);
+    }
 };
 
 var scUpdateTemplate = function (packet) {

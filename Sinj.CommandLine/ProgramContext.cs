@@ -9,10 +9,17 @@ namespace Sinj.CommandLine
 {
 	public class ProgramContext
 	{
+		private bool _debug;
+
+		public ProgramContext(bool debug)
+		{
+			_debug = debug;
+		}
+
 		[ScriptMember(Name = "push")]
 		public void Push(string endpoint, dynamic scripts)
 		{
-			Pusher executer = new Pusher(endpoint, EnumerateScripts(scripts).ToArray());
+			Pusher executer = new Pusher(endpoint, EnumerateScripts(scripts).ToArray(), _debug);
 
 			executer.Execute();
 		}

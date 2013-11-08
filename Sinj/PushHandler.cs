@@ -32,7 +32,14 @@ namespace Sinj
 			context.Response.ContentType = "text/plain";
 			context.Response.Write("Connected to SINJ handler on " + Environment.MachineName + "\r\n");
 
-			using (ScriptEngine engine = new JScriptEngine(WindowsScriptEngineFlags.EnableDebugging))
+			WindowsScriptEngineFlags flags = WindowsScriptEngineFlags.None;
+
+			if (context.Request.Params["debug"] == "true")
+			{
+				flags = WindowsScriptEngineFlags.EnableDebugging;
+			}
+
+			using (ScriptEngine engine = new JScriptEngine(flags))
 			{
 				engine.AddHostObject("$sc", new PushContext());
 				engine.AddHostType("$scItemManager", typeof(Sitecore.Data.Managers.ItemManager));

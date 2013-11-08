@@ -33,6 +33,9 @@ var scValue = function (value) {
 	else if (value === false) {
 		value = "";
 	}
+    else if (Object.prototype.toString.call(value) === '[object Array]') {
+        value = value.join("|")
+    }
 
 	return "" + value;
 }

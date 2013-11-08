@@ -15,11 +15,13 @@ namespace Sinj.CommandLine
 	{
 		private string _endpoint;
 		private string[] _scripts;
+		private bool _debug;
 
-		public Pusher(string endpoint, string[] scripts)
+		public Pusher(string endpoint, string[] scripts, bool debug)
 		{
 			_endpoint = endpoint;
 			_scripts = scripts;
+			_debug = debug;
 		}
 
 		public void Execute()
@@ -63,7 +65,14 @@ namespace Sinj.CommandLine
 
 			string script = BuildScript();
 
-			byte[] requestData = Encoding.UTF8.GetBytes(script.ToString());
+			string data = script;
+
+			if (_debug)
+			{
+				data = "debug=true&" + data;
+			}
+
+			byte[] requestData = Encoding.UTF8.GetBytes(data.ToString());
 
 			request.ContentLength = requestData.Length;
 

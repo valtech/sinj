@@ -14,12 +14,33 @@ namespace Sinj.CommandLine
 	{
 		static void Main(string[] args)
 		{
-			string[] paths = args;
+			List<string> paths = new List<string>();
+
+			bool debug = false;
+
+			foreach (string arg in args)
+			{
+				if (String.Equals(arg, "-debug", StringComparison.OrdinalIgnoreCase))
+				{
+					debug = true;
+				}
+				else
+				{
+					paths.Add(arg);
+				}
+			}
+
+			WindowsScriptEngineFlags flags = WindowsScriptEngineFlags.None;
+
+			if (debug)
+			{
+				flags = WindowsScriptEngineFlags.EnableDebugging;
+			}
 
             //new V8ScriptEngine(V8ScriptEngineFlags.EnableDebugging)
-			using (ScriptEngine engine = new JScriptEngine(WindowsScriptEngineFlags.EnableDebugging))
+			using (ScriptEngine engine = new JScriptEngine(flags))
 			{
-				engine.AddHostObject("$cmd", new ProgramContext());
+				engine.AddHostObject("$cmd", new ProgramContext(debug));
 
 				int pathIndex = -1;
 
