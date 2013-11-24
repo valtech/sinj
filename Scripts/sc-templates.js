@@ -81,10 +81,21 @@ var scInsertTemplate = function (packet) {
         scInsertTemplateSections(packet.sections);
     }
 
-    if (packet.standardValues) {
-        packet.standardValues.template = id;
+    var standardValues = packet.standardValues;
 
-        scInsertStandardValues(packet.standardValues);
+    if (standardValues) {
+    	if (Object.prototype.toString.call(standardValues) === '[object Array]') {
+    		for (var i = 0; i < standardValues.length; i++) {
+    			standardValues[i].template = id;
+    			
+    			scInsertStandardValues(standardValues[i]);
+    		}
+    	}
+    	else {
+        	standardValues.template = id;
+        	
+        	scInsertStandardValues(standardValues);
+    	}
     }
 
     if (packet.fields) {
@@ -197,6 +208,21 @@ var scInsertTemplateField = function (packet) {
 };
 
 var scInsertStandardValues = function (packet) {
+	var languages = packet.languages;
+
+	if (languages != null) {
+		for (var i = 0; i < languages.length; i++) {
+			scInsertStandardValuesForLanguage(packet, languages[i]);
+		}
+	}
+	else {
+		scInsertStandardValuesForLanguage(packet, packet.language);
+	}
+};
+
+var scInsertStandardValuesForLanguage = function (packet, language) {
+	$sc.log("standard values in language = " + language);
+
 	var template = $sc.db.GetTemplate(packet.template);
 
 	var standardValues = template.StandardValues;
@@ -205,9 +231,9 @@ var scInsertStandardValues = function (packet) {
 		standardValues = template.CreateStandardValues();
 	}
 
-	if (packet.language != null) {
+	if (language != null) {
 		//PERF: if language requested is same as standardValues, skip...
-		var localizedStandardValues = scItemQuery(standardValues.ID.Guid.ToString())(packet.language);
+		var localizedStandardValues = scItem(standardValues.ID.Guid.ToString(), language);
 	
 		if (localizedStandardValues.Versions.Count < 1) {
 			localizedStandardValues.Versions.AddVersion();

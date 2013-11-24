@@ -3,6 +3,8 @@
 
 	var item;
 
+	$sc.log("id = " + id);
+
 	if (language == null) {
 		item = database.GetItem(id);
 	}
@@ -18,6 +20,35 @@
 	}
 
 	return item;
+};
+
+var scEnsureItem = function (id, language, version) {
+    var item = scItem(id, language, version);
+
+    if (item != null) {
+        if (item.Versions.Count < 1) {
+            item = item.Versions.AddVersion();
+        }
+    }
+    
+    return item;
+};
+
+var scSwitchItem = function (item, language, version) {
+	if (language != null) {
+		//PERF: don't switch if current item is in requested language 
+
+		item = scEnsureItem(item.ID, language, version);
+	}
+	else {
+		if (item != null) {
+	        if (item.Versions.Count < 1) {
+	            item = item.Versions.AddVersion();
+	        }
+	    }
+	}
+
+    return item;
 };
 
 var scItemQuery = function (id) {
@@ -65,7 +96,6 @@ var scSetFields = function (values) {
                 if (field == null) {
                     if (name == "Insert Options") {
                         field = fields.Item.get("__Masters");
-                        $sc.log("Switching to masters");
                     }
                 }
             }
@@ -100,12 +130,12 @@ var scSetFields = function (values) {
 };
 
 var scUpdateItem = function (packet) {
-	//TODO: languages
-
 	var items = packet.item();
 
 	for (var j = 0; j < items.length; j++) {
 		var item = items[j];
+
+		item = scSwitchItem(item, packet.language);
 
 		$sc.log("Updating item '" + item.Paths.Path + "'");
 
@@ -129,16 +159,12 @@ var scInsertItems = function (packets) {
 	}
 };
 
-//for languages need destination of parent to be language
-
 var scInsertItem = function (packet) {
-    //TODO: languages
-
     if (packet.name == null) {
         throw "Name not specified for item to create.";
     }
 
-    var parent = scItem(packet.parent);
+    var parent = scItem(packet.parent, packet.language);
 
     var template = scTemplate(packet.template);
 
@@ -166,16 +192,18 @@ var scInsertItem = function (packet) {
         item.Editing.EndEdit();
     }
 
+    item = scSwitchItem(item);
+
     scSetFields(packet.fields)(item);
 };
 
 var scDeleteItem = function (packet) {
-	//TODO: languages
-
 	var items = packet.item();
 
 	for (var j = 0; j < items.length; j++) {
 		var item = items[j];
+
+		item = scSwitchItem(item, packet.language);
 
 		if (item != null) {
 			$sc.log("Deleting item '" + parent.Paths.Path + "'");
