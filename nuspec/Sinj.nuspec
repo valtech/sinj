@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
 	<metadata>
 		<id>Sinj</id>
-		<version>1.0.4</version>
+		<version>1.0.6</version>
 		<authors>True Clarity</authors>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Sitecore Ninja JavaScript - Server Components.</description>
@@ -23,6 +23,6 @@
 	</metadata>
 	<files>
 		<file src="..\Sinj\bin\Debug\Sinj.dll" target="lib\net40" />
-		<file src="..\Sinj.Web\PushHandler.ashx" target="content\sitecore" />
+		<file src="..\Sinj.Web\PushHandler.ashx" target="content\sitecore\sinj" />
 	</files>
 </package>

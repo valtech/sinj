@@ -13,3 +13,4 @@ Sitecore\*
 Example\*
 Sinj.Website.sln
 *.nupkg
+nuspec/README.txt

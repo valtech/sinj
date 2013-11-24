@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ClearScript;
@@ -31,6 +32,7 @@ namespace Sinj
 
 			context.Response.ContentType = "text/plain";
 			context.Response.Write("Connected to SINJ handler on " + Environment.MachineName + "\r\n");
+			context.Response.Write("Version " + Assembly.GetExecutingAssembly().GetName().Version + "\r\n");
 
 			WindowsScriptEngineFlags flags = WindowsScriptEngineFlags.None;
 
