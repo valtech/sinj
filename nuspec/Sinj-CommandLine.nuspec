@@ -13,7 +13,7 @@
 	</metadata>
 	<files>
 		<file src="..\Sinj.CommandLine\bin\Debug\Sinj.CommandLine.exe" target="tools" />
-		<file src="..\Sinj.CommandLine\bin\Debug\ClearScript.dll" target="tools" />
+		<file src="..\Sinj.CommandLine\bin\Debug\ClearScript.dll" target="lib\net40" />
 		<file src="..\Scripts\sc-items.js" target="tools" />
 		<file src="..\Scripts\sc-templates.js" target="tools" />
 	</files>
