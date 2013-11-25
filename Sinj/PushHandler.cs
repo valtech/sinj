@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.Windows;
-using System.IO;
 using System.Web;
 
 namespace Sinj
@@ -32,7 +27,7 @@ namespace Sinj
 
 			context.Response.ContentType = "text/plain";
 			context.Response.Write("Connected to SINJ handler on " + Environment.MachineName + "\r\n");
-			context.Response.Write("Version " + Assembly.GetExecutingAssembly().GetName().Version + "\r\n");
+			context.Response.Write("Sinj Version " + Assembly.GetExecutingAssembly().GetName().Version + "\r\n");
 
 			WindowsScriptEngineFlags flags = WindowsScriptEngineFlags.None;
 
@@ -67,11 +62,12 @@ namespace Sinj
 
 						TimeSpan duration = DateTime.Now - start;
 
-						context.Response.Write(String.Format("Completed in {0} seconds.", duration.TotalSeconds));
+						context.Response.Write(String.Format("Sinj.PushHandler Completed Successfully in {0} seconds.", duration.TotalSeconds));
 					}
 					catch (ScriptEngineException e)
 					{
-						context.Response.Write("Error in script file' " + paths[pathIndex] + "'. ");
+
+						context.Response.Write("PushHandler error in script file' " + paths[pathIndex] + "'. ");
 						context.Response.Write(e.ErrorDetails + "\r\n\r\n" + e.InnerException + "\r\n\r\n");
 					}
 				}
