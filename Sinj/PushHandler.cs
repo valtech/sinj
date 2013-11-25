@@ -66,7 +66,6 @@ namespace Sinj
 					}
 					catch (ScriptEngineException e)
 					{
-
 						context.Response.Write("PushHandler error in script file' " + paths[pathIndex] + "'. ");
 						context.Response.Write(e.ErrorDetails + "\r\n\r\n" + e.InnerException + "\r\n\r\n");
 					}
