@@ -17,11 +17,18 @@ namespace Sinj.CommandLine
 		}
 
 		[ScriptMember(Name = "push")]
-		public void Push(string endpoint, dynamic scripts)
+		public int Push(string endpoint, dynamic scripts)
 		{
-			Pusher executer = new Pusher(endpoint, EnumerateScripts(scripts).ToArray(), _debug);
+			try
+			{
+				Pusher executer = new Pusher(endpoint, EnumerateScripts(scripts).ToArray(), _debug);
 
-			executer.Execute();
+				return executer.Execute();
+			}
+			catch (Exception)
+			{
+				return 1;
+			}
 		}
 
 		private static IEnumerable<string> EnumerateScripts(dynamic scripts)
@@ -43,7 +50,7 @@ namespace Sinj.CommandLine
 		{
 			Console.WriteLine(message);
 		}
-
+		
 		[ScriptMember(Name = "cwd")]
 		public string CurrentWorkingDirectory
 		{

@@ -24,7 +24,7 @@ namespace Sinj.CommandLine
 			_debug = debug;
 		}
 
-		public void Execute()
+		public int Execute()
 		{
 			ServicePointManager.ServerCertificateValidationCallback = ValidateServerCertficate;
 
@@ -35,6 +35,8 @@ namespace Sinj.CommandLine
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
 			ReadResponse(response);
+
+			return response.StatusCode == HttpStatusCode.OK ? 0 : 1;
 		}
 
 		private static bool ValidateServerCertficate(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
