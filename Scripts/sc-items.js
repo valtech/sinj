@@ -206,7 +206,7 @@ var scDeleteItem = function (packet) {
 		item = scSwitchItem(item, packet.language);
 
 		if (item != null) {
-			$sc.log("Deleting item '" + parent.Paths.Path + "'");
+			$sc.log("Deleting item '" + item.Paths.Path + "'");
 
 			item.Delete();
 		}
