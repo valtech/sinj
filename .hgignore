@@ -1,0 +1,16 @@
+syntax: glob
+
+ClearScript-5.3.8\*
+*\obj\*
+Sinj.Website\*
+Sitecore 6.6.0 rev. 130529\*
+Sitecore\*
+*\bin\*
+*.suo
+*.user
+*.zip
+*.bat
+Example\*
+Sinj.Website.sln
+*.nupkg
+nuspec/README.txt

@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sinj", "Sinj\Sinj.csproj", "{80C09872-B87A-4650-8083-95A9D036F28F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sinj.CommandLine", "Sinj.CommandLine\Sinj.CommandLine.csproj", "{5396EB67-63A1-4B39-8C57-D4673223885F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{80C09872-B87A-4650-8083-95A9D036F28F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80C09872-B87A-4650-8083-95A9D036F28F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80C09872-B87A-4650-8083-95A9D036F28F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80C09872-B87A-4650-8083-95A9D036F28F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5396EB67-63A1-4B39-8C57-D4673223885F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5396EB67-63A1-4B39-8C57-D4673223885F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5396EB67-63A1-4B39-8C57-D4673223885F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5396EB67-63A1-4B39-8C57-D4673223885F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
