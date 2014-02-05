@@ -50,6 +50,8 @@ namespace Sinj.CommandLine
 
 			foreach (string script in _scripts)
 			{
+				Console.Write("Reading script : " + script + "\r\n");
+
 				string contents = File.ReadAllText(script);
 
 				builder.AppendFormat("{0}={1}&", "path", HttpUtility.UrlEncode(script));

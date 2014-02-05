@@ -12,7 +12,7 @@ namespace Sinj.CommandLine
 			CommandLineEngine engine = new CommandLineEngine(args);
 			int returnValue = engine.TryExecute();
 
-			Console.WriteLine("Sinj.CommandLine Completed " + (returnValue == 0 ? "Successfully" : "Failed"));
+			Console.WriteLine("Sinj.CommandLine Completed " + (returnValue == 0 ? "Successfully" : "Failed (ErrorCode=" + returnValue + ")"));
 			return returnValue;
 		}
 	}
