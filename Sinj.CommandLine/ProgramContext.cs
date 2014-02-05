@@ -1,9 +1,6 @@
 ﻿using Microsoft.ClearScript;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sinj.CommandLine
 {
@@ -25,8 +22,10 @@ namespace Sinj.CommandLine
 
 				return executer.Execute();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				Console.Write(ex.Message + "\r\n");
+
 				return 1;
 			}
 		}

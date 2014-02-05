@@ -29,6 +29,9 @@ namespace Sinj
 			context.Response.Write("Connected to SINJ handler on " + Environment.MachineName + "\r\n");
 			context.Response.Write("Sinj Version " + Assembly.GetExecutingAssembly().GetName().Version + "\r\n");
 
+			context.Response.Write("Num Paths = " + GetDebugString(paths) + "\r\n");
+			context.Response.Write("Num Scripts = " + GetDebugString(scripts) + "\r\n");
+
 			WindowsScriptEngineFlags flags = WindowsScriptEngineFlags.None;
 
 			if (context.Request.Params["debug"] == "true")
@@ -75,6 +78,11 @@ namespace Sinj
 					engine.Execute("$sc.log('Hello from Sinj...')");
 				}
 			}
+		}
+
+		private static string GetDebugString(string[] array)
+		{
+			return array == null ? "null" : array.Length.ToString();
 		}
 	}
 }
