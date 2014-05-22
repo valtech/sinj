@@ -43,11 +43,13 @@ namespace Sinj
 			{
 				engine.AddHostObject("$sc", new PushContext());
 				engine.AddHostType("$scItemManager", typeof(Sitecore.Data.Managers.ItemManager));
+				engine.AddHostType("$scTemplateManager", typeof(Sitecore.Data.Managers.TemplateManager));
 				engine.AddHostType("$scLanguage", typeof(Sitecore.Globalization.Language));
 				engine.AddHostType("$scVersion", typeof(Sitecore.Data.Version));
 				engine.AddHostType("$scID", typeof(Sitecore.Data.ID));
 				engine.AddHostType("$scTemplateIDs", typeof(Sitecore.TemplateIDs));
 				engine.AddHostType("$scTemplateFieldIDs", typeof(Sitecore.TemplateFieldIDs));
+				engine.AddHostType("$scTemplateFieldSharing", typeof(Sitecore.Data.Templates.TemplateFieldSharing));
 
 				if (scripts != null && paths != null)
 				{
