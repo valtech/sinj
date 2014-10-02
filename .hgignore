@@ -5,6 +5,7 @@ ClearScript-5.3.8\*
 Sinj.Website\*
 Sitecore 6.6.0 rev. 130529\*
 Sitecore\*
+Library\Sitecore.Kernel.dll
 *\bin\*
 *.suo
 *.user

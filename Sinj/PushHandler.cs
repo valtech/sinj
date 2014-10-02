@@ -41,7 +41,8 @@ namespace Sinj
 
 			using (ScriptEngine engine = new JScriptEngine(flags))
 			{
-				engine.AddHostObject("$sc", new PushContext());
+			    var pushContext = new PushContext();
+                engine.AddHostObject("$sc", pushContext);
 				engine.AddHostType("$scItemManager", typeof(Sitecore.Data.Managers.ItemManager));
 				engine.AddHostType("$scTemplateManager", typeof(Sitecore.Data.Managers.TemplateManager));
 				engine.AddHostType("$scLanguage", typeof(Sitecore.Globalization.Language));
@@ -50,6 +51,7 @@ namespace Sinj
 				engine.AddHostType("$scTemplateIDs", typeof(Sitecore.TemplateIDs));
 				engine.AddHostType("$scTemplateFieldIDs", typeof(Sitecore.TemplateFieldIDs));
 				engine.AddHostType("$scTemplateFieldSharing", typeof(Sitecore.Data.Templates.TemplateFieldSharing));
+                engine.AddHostType("$scMediaItem", typeof(MediaItemFacade));
 
 				if (scripts != null && paths != null)
 				{
