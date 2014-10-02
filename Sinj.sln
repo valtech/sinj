@@ -5,6 +5,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sinj", "Sinj\Sinj.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sinj.CommandLine", "Sinj.CommandLine\Sinj.CommandLine.csproj", "{5396EB67-63A1-4B39-8C57-D4673223885F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{A5A3BBEE-7598-4231-B607-85FBA113B008}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{A55F3AA5-B3DA-4C0E-8230-C753BC3EB244}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\sc-items.js = Scripts\sc-items.js
+		Scripts\sc-media.js = Scripts\sc-media.js
+		Scripts\sc-templates.js = Scripts\sc-templates.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
