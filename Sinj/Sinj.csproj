@@ -55,7 +55,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MediaItemFacade.cs" />
+    <Compile Include="MediaItem.cs" />
     <Compile Include="PushHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PushContext.cs" />
