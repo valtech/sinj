@@ -50,7 +50,7 @@ namespace Sinj
 				engine.AddHostType("$scTemplateIDs", typeof(Sitecore.TemplateIDs));
 				engine.AddHostType("$scTemplateFieldIDs", typeof(Sitecore.TemplateFieldIDs));
 				engine.AddHostType("$scTemplateFieldSharing", typeof(Sitecore.Data.Templates.TemplateFieldSharing));
-                engine.AddHostObject("$scMediaItem", new MediaItemFacade());
+                engine.AddHostObject("$scMediaItem", new MediaItem());
 
 				if (scripts != null && paths != null)
 				{
