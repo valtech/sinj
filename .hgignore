@@ -10,7 +10,6 @@ Library\Sitecore.Kernel.dll
 *.suo
 *.user
 *.zip
-*.bat
 Example\*
 Sinj.Website.sln
 *.nupkg
