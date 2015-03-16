@@ -231,7 +231,7 @@ var scInsertStandardValuesForLanguage = function (packet, language) {
 	    if (packet.id == null) {
 	        standardValues = template.CreateStandardValues();
 	    } else {
-	        var standardValues = $scItemManager.AddFromTemplate("__Standard values", template.ID, template.InnerItem, new $scID(packet.id));
+	        var standardValues = $scItemManager.AddFromTemplate("__Standard Values", template.ID, template.InnerItem, new $scID(packet.id));
 
 	        template.InnerItem.Editing.BeginEdit();
 	        var standardValuesField = template.InnerItem.Fields.Item.get($scFieldIDs.StandardValues);
