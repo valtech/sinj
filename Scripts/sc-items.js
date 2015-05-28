@@ -192,7 +192,7 @@ var scInsertItem = function (packet) {
 	var item;
 
 	$sc.log("Inserting item '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
-.
+	
 	if (packet.id == null) {
 		item = parent.Add(packet.name, template);
 	} else {
