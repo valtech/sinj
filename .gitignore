@@ -1,0 +1,7 @@
+/Sinj/bin/Debug
+/Sinj/obj
+/Sinj.CommandLine/bin/Debug
+/Sinj.CommandLine/obj
+/packages
+*.user
+*.suo
