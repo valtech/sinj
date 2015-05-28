@@ -40,11 +40,8 @@ var scEnsureItem = function (id, language, version) {
 
 var scSwitchItem = function (item, language, version) {
 	if (language != null) {
-		//PERF: don't switch if current item is in requested language 
-
 		item = scEnsureItem(item.ID, language, version);
-	}
-	else {
+	} else {
 		if (item != null) {
 			if (item.Versions.Count < 1) {
 				item = item.Versions.AddVersion();
@@ -103,7 +100,17 @@ var scSetFields = function (values) {
 			}
 
 			if (field != null) {
-				if (value != field.Value) {
+			    var rawValue = values[name];
+			    var value = null;
+
+			    if (rawValue && typeof (rawValue) === "function") {
+			        value = rawValue(field.Value, item);
+			        value = scValue(value);
+			    } else {
+			        value = scValue(rawValue);
+			    }
+
+			    if (value != field.Value) {
 					updates.push({
 						field: field,
 						value: value
@@ -125,7 +132,13 @@ var scSetFields = function (values) {
 			for (var i = 0; i < updates.length; i++) {
 				var update = updates[i];
 
-				update.field.SetValue(update.value, true);
+				if (update.field.Name == "__Masters" && update.value == 'null') {
+				    $sc.log('resetting Insert Options');
+				    update.field.Reset();
+			    } else {
+				    $sc.log('Updating field value');
+			        update.field.SetValue(update.value, true);
+			    }
 			}
 
 			item.Editing.EndEdit();
@@ -179,12 +192,10 @@ var scInsertItem = function (packet) {
 	var item;
 
 	$sc.log("Inserting item '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
-
-	//PERF: if item exists, skip...
+.
 	if (packet.id == null) {
 		item = parent.Add(packet.name, template);
-	}
-	else {
+	} else {
 		item = $scItemManager.AddFromTemplate(packet.name, template.ID, parent, new $scID(packet.id));
 	}
 
@@ -229,19 +240,6 @@ var scDeleteItems = function (packets) {
 	}
 };
 
-var scMoveItem = function (itemId, newParentId) {
-    var itemToMove = scItem(itemId, null, null);
-    var newParentItem = scItem(newParentId, null, null);
-
-    if (itemToMove && newParentItem) {
-        $sc.log("Moving '" + itemId + "' (" + itemToMove.Paths.FullPath + ") to " + newParentItem.Paths.FullPath);
-
-        itemToMove.MoveTo(newParentItem);
-    } else {
-        $sc.log("Cannot move item, item or parent not found.");
-    }
-};
-
 var scRunActionForChildrenOf = function (parent, action) {
     for (var i = 0; i < parent.Children.Count; i++) {
         var result = action(parent.Children.Item(i));
@@ -270,4 +268,78 @@ var scCreateUpdateObject = function (item) {
 		language: item.Language.ToString(),
 		fields: {}
 	};
+};
+
+var scMoveItem = function (itemId, newParentPath) {
+    var item = $sc.db.GetItem(itemId);
+    var newParent = $sc.db.GetItem(newParentPath);
+
+    if (item != null && newParent != null && item.Parent.ID != newParent.ID) {
+        $sc.log("Moving item '" + item.Paths.Path + "' to '" + newParent.Paths.Path + "/" + item.Name + "'");
+
+        item.MoveTo(newParent);
+    }
+};
+
+var scFieldValueEnsureInList = function () {
+    var itemIds = arguments;
+
+    return function (existingValue, item) {
+        var newValue = existingValue;
+
+        for (var i = 0; i < itemIds.length; i++) {
+            var itemId = itemIds[i];
+            var foundIndex = newValue.toLowerCase().indexOf(itemId.toLowerCase());
+
+            if (foundIndex == -1) {
+                if (newValue) {
+                    newValue = newValue + "|" + itemId;
+                } else {
+                    newValue = itemId;
+                }
+            }
+        }
+
+        return newValue;
+    };
+};
+
+var scDeleteItemById = function (itemId) {
+    var item = $sc.db.GetItem(itemId);
+
+    if(item) {
+        if (typeof (item.ID) != 'undefined') {
+            $sc.log("Deleting item '" + item.Paths.Path + "'");
+
+            item.Delete();
+        } else {
+            $sc.log("Cannot delete item, it does not exist.");
+        }
+    }
+};
+
+function scUpdateSingleField(id, language, fieldName, value) {
+    var updatePackage =
+    {
+        item: scItemQuery(id),
+        language: language,
+        fields: {}
+    };
+
+    updatePackage.fields[fieldName] = value;
+
+    scUpdateItem(updatePackage);
+};
+
+function scSetSortOrder(fieldId, sortOrder) {
+    var update =
+    {
+        item: scItemQuery(fieldId),
+        language: "en",
+        fields: {
+            "Sortorder": sortOrder
+        }
+    };
+
+    scUpdateItem(update);
 };

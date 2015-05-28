@@ -1,16 +1,16 @@
 var scTemplate = function (id) {
-	var template = $sc.db.GetTemplate(id);
+    var template = $sc.db.GetTemplate(id);
 
-	if (template == null) {
-		var item = $sc.db.GetItem(id);
+    if (template == null) {
+        var item = $sc.db.GetItem(id);
 
-		if (item != null) {
-			template = $sc.db.GetTemplate(item.ID);
-		}
-	}
+        if (item != null) {
+            template = $sc.db.GetTemplate(item.ID);
+        }
+    }
 
-	return template;
-}
+    return template;
+};
 
 var scInsertTemplates = function (packets) {
 	for (var i = 0; i < packets.length; i++) {
@@ -73,6 +73,12 @@ var scInsertTemplate = function (packet) {
 
 	var id = item.ID.Guid.ToString();
 
+	if (packet.fields) {
+	    item = $sc.db.GetItem(item.ID);
+
+	    scSetFields(packet.fields)(item);
+	}
+
 	if (packet.sections) {
 		for (var j = 0; j < packet.sections.length; j++) {
 			packet.sections[j].template = id;
@@ -97,12 +103,6 @@ var scInsertTemplate = function (packet) {
 			scInsertStandardValues(standardValues);
 		}
 	}
-
-	if (packet.fields) {
-		item = $sc.db.GetItem(item.ID);
-
-		scSetFields(packet.fields)(item);
-	}
 };
 
 var scUpdateTemplate = function (packet) {
@@ -126,7 +126,6 @@ var scInsertTemplateSection = function (packet) {
 
 	var item;
 
-	//PERF: if section exists, skip...
 	if (packet.id == null) {
 		item = template.AddSection(packet.name);
 	}
@@ -142,6 +141,10 @@ var scInsertTemplateSection = function (packet) {
 		item.Name = packet.name;
 
 		item.Editing.EndEdit();
+	}
+
+	if (scSetFields && packet.sectionFields) {
+	    scSetFields(packet.sectionFields)(item);
 	}
 
 	for (var j = 0; j < packet.fields.length; j++) {
@@ -167,7 +170,6 @@ var scInsertTemplateField = function (packet) {
 
 	var item;
 
-	//PERF: if field exists, skip...
 	if (packet.id == null) {
 		item = section.AddField(packet.name);
 	}
@@ -227,9 +229,17 @@ var scInsertStandardValuesForLanguage = function (packet, language) {
 
 	var standardValues = template.StandardValues;
 
+	if (standardValues != null) {
+	    var expectedId = new $scID(packet.id);
+
+	    if (standardValues.ID.Guid.ToString() != expectedId.Guid.ToString()) {
+			throw "Standard values did not have expected ID, stopping"
+	    }
+	}
+
 	if (standardValues == null) {
-	    if (packet.id == null) {
-	        standardValues = template.CreateStandardValues();
+        if (packet.id == null) {
+            throw "Id not specified for standard values for template.";
 	    } else {
 	        var standardValues = $scItemManager.AddFromTemplate("__Standard Values", template.ID, template.InnerItem, new $scID(packet.id));
 
@@ -241,7 +251,6 @@ var scInsertStandardValuesForLanguage = function (packet, language) {
 	}
 
 	if (language != null) {
-		//PERF: if language requested is same as standardValues, skip...
 		var localizedStandardValues = scItem(standardValues.ID.Guid.ToString(), language);
 
 		if (localizedStandardValues.Versions.Count < 1) {
@@ -285,6 +294,17 @@ var scMakeFieldShared = function(templateId, field) {
 	$sc.log("scMakeFieldShared result:" + result);
 }
 
+var scChangeTemplate = function (itemId, newTemplateId) {
+    var template = $sc.db.GetTemplate(newTemplateId);
+    var item = $sc.db.GetItem(itemId);
+
+    if (item != null && template != null && item.Template.ID != template.ID) {
+        $sc.log("Changing template of '" + item.Paths.Path + "' to '" + template.InnerItem.Paths.Path + "'");
+
+        item.ChangeTemplate(template);
+    }
+};
+
 var scFieldTypes = {
 	"Checkbox": "Checkbox",
 	"Date": "Date",
@@ -303,14 +323,22 @@ var scFieldTypes = {
 	"GroupedDroplist": "Grouped Droplist",
 	"GroupedDroplink": "Grouped Droplink",
 	"Multilist": "Multilist",
+	"MultilistWithSearch": "Multilist with Search",
 	"Treelist": "Treelist",
 	"Droplink": "Droplink",
 	"Droptree": "Droptree",
 	"Tristate": "Tristate",
 	"NameValueList": "Name Value List",
-	"GeneralLink": "General Link"
+	"GeneralLink": "General Link",
+    "SmartTreeList": "Smart Treelist"
 };
 
 var scFieldValidation = {
     Required: "{59D4EE10-627C-4FD3-A964-61A88B092CBC}"
+}
+
+var scAllLanguages = [];
+
+for (var j = 0; j < $sc.db.Languages.Length; j++) {
+    scAllLanguages[j] = $sc.db.Languages[j].Name;
 }
