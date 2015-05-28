@@ -1,1 +1,0 @@
-nuget push -Source "http://nuget.tcuk.com" -ApiKey 3!QV%hX7e3nA *.nupkg
