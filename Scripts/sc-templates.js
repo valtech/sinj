@@ -33,16 +33,19 @@ var scInsertTemplate = function (packet) {
 
 	var parentBranch = $sc.db.Branches["__Template"];
 
-	var item;
+	var item = null;
 
 	if (packet.id != null) {
-		item = $sc.db.GetTemplate(packet.id);
+		templateItem = $sc.db.GetTemplate(packet.id);
+		
+		if(templateItem != null) {
+			item = templateItem.InnerItem;
+		}
 	}
 
 	$sc.log("Inserting template '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
 
 	if (item == null) {
-		//PERF: if template exists, skip...
 		if (parentBranch == null) {
 			var parentTemplate = $sc.db.Templates.Item.get($scTemplateIDs.Template);
 
