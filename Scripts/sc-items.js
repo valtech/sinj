@@ -1,10 +1,7 @@
 ﻿var scItem = function (id, language, version) {
     if (id) {
         var database = $sc.db;
-
         var item;
-
-        $sc.log("id = " + id + ", lang = " + language + ", version = " + version);
 
         if (language == null) {
             item = database.GetItem(id);
@@ -118,25 +115,24 @@ var scSetFields = function (values) {
 				}
 			}
 			else {
-				var msg = "Field '" + name + "' does not exist for item + '" + item.Paths.Path + "'.";
-				$sc.log(msg);
+				$sc.log(item.Paths.Path + " - Field '" + name + "' does not exist");
 				throw msg;
 			}
 		}
 
 		if (updates.length > 0) {
-			$sc.log("Fields changed on '" + item.Paths.Path + "'");
-
 			item.Editing.BeginEdit();
 
 			for (var i = 0; i < updates.length; i++) {
 				var update = updates[i];
 
 				if (update.field.Name == "__Masters" && update.value == 'null') {
-				    $sc.log('resetting Insert Options');
+					$sc.log(item.Paths.Path + " - Resetting Insert Options");
+
 				    update.field.Reset();
-			    } else {
-				    $sc.log('Updating field value');
+				} else {
+					$sc.log(item.Paths.Path + " - Updating field '" + name + "' in " + item.Language.ToString());
+
 			        update.field.SetValue(update.value, true);
 			    }
 			}
@@ -153,8 +149,6 @@ var scUpdateItem = function (packet) {
 		var item = items[j];
 
 		item = scSwitchItem(item, packet.language);
-
-		$sc.log("Updating item '" + item.Paths.Path + "'");
 
 		scSetFields(packet.fields)(item);
 	}
@@ -191,15 +185,21 @@ var scInsertItem = function (packet) {
 
 	var item;
 
-	$sc.log("Inserting item '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
-	
 	if (packet.id == null) {
+		$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating item");
+
 		item = parent.Add(packet.name, template);
 	} else {
+		if (!scItemExists(packet.id)) {
+			$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating item");
+		}
+
 		item = $scItemManager.AddFromTemplate(packet.name, template.ID, parent, new $scID(packet.id));
 	}
 
 	if (item.Name != packet.name) {
+		$sc.log(item.Paths.Path + " - Renaming item to '" + packet.name + "'");
+
 		item.Editing.BeginEdit();
 
 		item.Name = packet.name;
@@ -222,7 +222,7 @@ var scDeleteItem = function (packet) {
 		    item = scSwitchItem(item, packet.language);
 
 		    if (item != null) {
-		        $sc.log("Deleting item '" + item.Paths.Path + "'");
+		    	$sc.log(item.Paths.Path + " - Deleting item");
 
 		        item.Delete();
 		    }
@@ -275,7 +275,7 @@ var scMoveItem = function (itemId, newParentPath) {
     var newParent = $sc.db.GetItem(newParentPath);
 
     if (item != null && newParent != null && item.Parent.ID != newParent.ID) {
-        $sc.log("Moving item '" + item.Paths.Path + "' to '" + newParent.Paths.Path + "/" + item.Name + "'");
+    	$sc.log(item.Paths.Path + " - Moving item to '" + newParent.Paths.Path + "/" + item.Name + "'");
 
         item.MoveTo(newParent);
     }
@@ -305,16 +305,12 @@ var scFieldValueEnsureInList = function () {
 };
 
 var scDeleteItemById = function (itemId) {
-    var item = $sc.db.GetItem(itemId);
+    if (scItemExists(itemId)) {
+    	var item = $sc.db.GetItem(itemId);
 
-    if(item) {
-        if (typeof (item.ID) != 'undefined') {
-            $sc.log("Deleting item '" + item.Paths.Path + "'");
-
-            item.Delete();
-        } else {
-            $sc.log("Cannot delete item, it does not exist.");
-        }
+    	item.Delete();
+    } else {
+    	$sc.log("Cannot delete item, it does not exist.");
     }
 };
 
@@ -343,3 +339,15 @@ function scSetSortOrder(fieldId, sortOrder) {
 
     scUpdateItem(update);
 };
+
+function scItemExists(id) {
+	var item = $sc.db.GetItem(id);
+
+	if (item) {
+		if (typeof (item.ID) != 'undefined') {
+			return true;
+		}
+	}
+
+	return false;
+}

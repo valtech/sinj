@@ -28,7 +28,7 @@ var scInsertTemplate = function (packet) {
 	var parent = $sc.db.GetItem(packet.parent);
 
 	if (parent == null) {
-		throw "Template '" + packet.parent + "'' not found.";
+		throw "Parent '" + packet.parent + "'' not found.";
 	}
 
 	var parentBranch = $sc.db.Branches["__Template"];
@@ -43,30 +43,41 @@ var scInsertTemplate = function (packet) {
 		}
 	}
 
-	$sc.log("Inserting template '" + packet.name + "' under parent '" + parent.Paths.Path + "'");
-
 	if (item == null) {
 		if (parentBranch == null) {
 			var parentTemplate = $sc.db.Templates.Item.get($scTemplateIDs.Template);
 
 			if (packet.id == null) {
+				$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template");
 				item = parent.Add(packet.name, parentTemplate);
 			}
 			else {
+				if (!scItemExists(packet.id)) {
+					$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template");
+				}
+
 				item = $scItemManager.AddFromTemplate(packet.name, parentTemplate.ID, parent, new $scID(packet.id));
 			}
 		}
 		else {
 			if (packet.id == null) {
+				$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template from branch");
+
 				item = parent.Add(packet.name, parentBranch);
 			}
 			else {
+				if (!scItemExists(packet.id)) {
+					$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template from branch");
+				}
+
 				item = $scItemManager.AddFromTemplate(packet.name, parentBranch.ID, parent, new $scID(packet.id));
 			}
 		}
 	}
 
 	if (item.Name != packet.name) {
+		$sc.log(item.Paths.Path + " - Renaming template to '" + packet.name + "'");
+
 		item.Editing.BeginEdit();
 
 		item.Name = packet.name;
@@ -130,15 +141,23 @@ var scInsertTemplateSection = function (packet) {
 	var item;
 
 	if (packet.id == null) {
+		$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template section");
+
 		item = template.AddSection(packet.name);
 	}
 	else {
 		var parentTemplate = $sc.db.Templates.Item.get($scTemplateIDs.TemplateSection);
 
+		if (!scItemExists(packet.id)) {
+			$sc.log(template.InnerItem.Paths.Path + "/" + packet.name + " - Creating template section");
+		}
+
 		item = $scItemManager.AddFromTemplate(packet.name, parentTemplate.ID, template.InnerItem, new $scID(packet.id));
 	}
 
 	if (item.Name != packet.name) {
+		$sc.log(item.Paths.Path + " - Renaming template section to '" + packet.name + "'");
+
 		item.Editing.BeginEdit();
 
 		item.Name = packet.name;
@@ -174,15 +193,23 @@ var scInsertTemplateField = function (packet) {
 	var item;
 
 	if (packet.id == null) {
+		$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template field");
+
 		item = section.AddField(packet.name);
 	}
 	else {
 		var parentTemplate = $sc.db.Templates.Item.get($scTemplateIDs.TemplateField);
 
+		if (!scItemExists(packet.id)) {
+			$sc.log(section.InnerItem.Paths.Path + "/" + packet.name + " - Creating template field");
+		}
+
 		item = $scItemManager.AddFromTemplate(packet.name, parentTemplate.ID, section.InnerItem, new $scID(packet.id));
 	}
 
 	if (item.Name != packet.name) {
+		$sc.log(item.Paths.Path + " - Renaming template field to '" + packet.name + "'");
+
 		item.Editing.BeginEdit();
 
 		item.Name = packet.name;
@@ -226,8 +253,6 @@ var scInsertStandardValues = function (packet) {
 };
 
 var scInsertStandardValuesForLanguage = function (packet, language) {
-	$sc.log("standard values in language = " + language);
-
 	var template = $sc.db.GetTemplate(packet.template);
 
 	var standardValues = template.StandardValues;
@@ -282,19 +307,15 @@ var scMakeFieldsShared = function (template) {
 var scMakeFieldShared = function(templateId, field) {
 	var fieldId = field.id;
 
-	$sc.log("scMakeFieldsShared on template:" + templateId + " field:" + fieldId);
-
 	var templateField = $scTemplateManager.GetTemplateField(new $scID(fieldId), new $scID(templateId), $sc.db);
 
 	if (templateField.IsShared) {
-		$sc.log("scMakeFieldsShared skipping because this field is already shared.");
 		return;
 	}
 
-	var result = $scTemplateManager.ChangeFieldSharing(templateField, $scTemplateFieldSharing.Shared, $sc.db);
+	$sc.log("Template = '" + templateId + "' setting field '" + field + "' as shared");
 
-
-	$sc.log("scMakeFieldShared result:" + result);
+	$scTemplateManager.ChangeFieldSharing(templateField, $scTemplateFieldSharing.Shared, $sc.db);
 }
 
 var scChangeTemplate = function (itemId, newTemplateId) {
@@ -302,7 +323,7 @@ var scChangeTemplate = function (itemId, newTemplateId) {
     var item = $sc.db.GetItem(itemId);
 
     if (item != null && template != null && item.Template.ID != template.ID) {
-        $sc.log("Changing template of '" + item.Paths.Path + "' to '" + template.InnerItem.Paths.Path + "'");
+    	$sc.log(item.Paths.Path + " - Changing template to '" + template.InnerItem.Paths.Path + "'");
 
         item.ChangeTemplate(template);
     }

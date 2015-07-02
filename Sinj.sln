@@ -13,6 +13,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CD7B9C
 		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{A9781C83-E9FF-4897-9E76-EF9CC9E30616}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\sc-items.js = Scripts\sc-items.js
+		Scripts\sc-media.js = Scripts\sc-media.js
+		Scripts\sc-templates.js = Scripts\sc-templates.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
