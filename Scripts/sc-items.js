@@ -351,3 +351,16 @@ function scItemExists(id) {
 
 	return false;
 }
+
+function scRenameItem(id, newItemName) {
+	if (scItemExists(itemId)) {
+    	var item = $sc.db.GetItem(itemId);
+		
+		item.Editing.BeginEdit();
+		item.Name = newItemName;
+		item.Editing.AcceptChanges(false, false);
+		item.Editing.EndEdit();
+    } else {
+    	$sc.log("Cannot rename item, it does not exist.");
+    }
+}
