@@ -352,7 +352,7 @@ function scItemExists(id) {
 	return false;
 }
 
-function scRenameItem(id, newItemName) {
+function scRenameItem(itemId, newItemName) {
 	if (scItemExists(itemId)) {
     	var item = $sc.db.GetItem(itemId);
 		
