@@ -27,8 +27,8 @@ var scInsertTemplate = function (packet) {
 
 	var parent = $sc.db.GetItem(packet.parent);
 
-	if (parent == null) {
-		throw "Parent '" + packet.parent + "'' not found.";
+	if (!scIsValidItem(parent)) {
+		throw "Could not find parent '" + packet.parent + "'";
 	}
 
 	var parentBranch = $sc.db.Branches["__Template"];
@@ -141,7 +141,7 @@ var scInsertTemplateSection = function (packet) {
 	var item;
 
 	if (packet.id == null) {
-		$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template section");
+		$sc.log(template.InnerItem.Paths.Path + "/" + packet.name + " - Creating template section");
 
 		item = template.AddSection(packet.name);
 	}
@@ -193,7 +193,7 @@ var scInsertTemplateField = function (packet) {
 	var item;
 
 	if (packet.id == null) {
-		$sc.log(parent.Paths.Path + "/" + packet.name + " - Creating template field");
+		$sc.log(section.InnerItem.Paths.Path + "/" + packet.name + " - Creating template field");
 
 		item = section.AddField(packet.name);
 	}

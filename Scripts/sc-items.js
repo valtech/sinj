@@ -131,7 +131,7 @@ var scSetFields = function (values) {
 
 				    update.field.Reset();
 				} else {
-					$sc.log(item.Paths.Path + " - Updating field '" + name + "' in " + item.Language.ToString());
+					$sc.log(item.Paths.Path + " - Updating field '" + update.field.Name + "' in " + item.Language.ToString());
 
 			        update.field.SetValue(update.value, true);
 			    }
@@ -177,9 +177,13 @@ var scInsertItem = function (packet) {
 
 	var parent = scItem(packet.parent, packet.language);
 
+	if (!scIsValidItem(parent)) {
+		throw "Could not find parent '" + packet.parent + "'";
+	}
+
 	var template = scTemplate(packet.template);
 
-	if (template == null) {
+	if (!scIsValidItem(template)) {
 		throw "Could not find template '" + packet.template + "'";
 	}
 
@@ -308,6 +312,8 @@ var scDeleteItemById = function (itemId) {
     if (scItemExists(itemId)) {
     	var item = $sc.db.GetItem(itemId);
 
+    	$sc.log(item.Paths.Path + " - Deleting item");
+
     	item.Delete();
     } else {
     	$sc.log("Cannot delete item, it does not exist.");
@@ -343,6 +349,10 @@ function scSetSortOrder(fieldId, sortOrder) {
 function scItemExists(id) {
 	var item = $sc.db.GetItem(id);
 
+	return scIsValidItem(item);
+}
+
+function scIsValidItem(item) {
 	if (item) {
 		if (typeof (item.ID) != 'undefined') {
 			return true;
