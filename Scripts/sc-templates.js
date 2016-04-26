@@ -22,13 +22,13 @@ var scInsertTemplates = function (packets) {
 
 var scInsertTemplate = function (packet) {
 	if (packet.name == null) {
-		throw "Name not specified for template to create.";
+		throw new Error("Name not specified for template to create.");
 	}
 
 	var parent = $sc.db.GetItem(packet.parent);
 
 	if (!scIsValidItem(parent)) {
-		throw "Could not find parent '" + packet.parent + "'";
+		throw new Error("Could not find parent '" + packet.parent + "'");
 	}
 
 	var parentBranch = $sc.db.Branches["__Template"];
@@ -121,7 +121,7 @@ var scInsertTemplate = function (packet) {
 
 var scUpdateTemplate = function (packet) {
 	if (packet.name == null) {
-		throw "Name not specified for template to create.";
+		throw new Error("Name not specified for template to create.");
 	}
 
 	var parents = packet.parent();
@@ -261,13 +261,13 @@ var scInsertStandardValuesForLanguage = function (packet, language) {
 	    var expectedId = new $scID(packet.id);
 
 	    if (standardValues.ID.Guid.ToString() != expectedId.Guid.ToString()) {
-			throw "Standard values did not have expected ID, stopping"
+	    	throw new Error("Standard values did not have expected ID, stopping");
 	    }
 	}
 
 	if (standardValues == null) {
         if (packet.id == null) {
-            throw "Id not specified for standard values for template.";
+            throw new Error("Id not specified for standard values for template.");
 	    } else {
 	        var standardValues = $scItemManager.AddFromTemplate("__Standard Values", template.ID, template.InnerItem, new $scID(packet.id));
 

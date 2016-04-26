@@ -115,8 +115,9 @@ var scSetFields = function (values) {
 				}
 			}
 			else {
-				$sc.log(item.Paths.Path + " - Field '" + name + "' does not exist");
-				throw msg;
+				var msg = item.Paths.Path + " - Field '" + name + "' does not exist";
+
+				throw new Error(msg);
 			}
 		}
 
@@ -172,19 +173,19 @@ var scInsertItems = function (packets) {
 
 var scInsertItem = function (packet) {
 	if (packet.name == null) {
-		throw "Name not specified for item to create.";
+		throw new Error("Name not specified for item to create.");
 	}
 
 	var parent = scItem(packet.parent, packet.language);
 
 	if (!scIsValidItem(parent)) {
-		throw "Could not find parent '" + packet.parent + "'";
+		throw new Error("Could not find parent '" + packet.parent + "'");
 	}
 
 	var template = scTemplate(packet.template);
 
 	if (!scIsValidItem(template)) {
-		throw "Could not find template '" + packet.template + "'";
+		throw new Error("Could not find template '" + packet.template + "'");
 	}
 
 	var item;
