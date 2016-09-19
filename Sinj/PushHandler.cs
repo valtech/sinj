@@ -3,6 +3,7 @@ using System.Reflection;
 using Microsoft.ClearScript;
 using Microsoft.ClearScript.Windows;
 using System.Web;
+using System.Configuration;
 
 namespace Sinj
 {
@@ -57,13 +58,16 @@ namespace Sinj
 				{
 					try
 					{
-						using (new Sitecore.SecurityModel.SecurityDisabler())
+						using (new Sitecore.Security.Accounts.UserSwitcher(Sitecore.Security.Accounts.User.FromName(RunAsUser, true)))
 						{
-							foreach (string script in scripts)
+							using (new Sitecore.SecurityModel.SecurityDisabler())
 							{
-								pathIndex++;
+								foreach (string script in scripts)
+								{
+									pathIndex++;
 
-								engine.Execute(script);
+									engine.Execute(script);
+								}
 							}
 						}
 
@@ -83,10 +87,26 @@ namespace Sinj
 				}
 			}
 		}
-
+		
 		private static string GetDebugString(string[] array)
 		{
 			return array == null ? "null" : array.Length.ToString();
+		}
+
+
+		private string RunAsUser
+		{
+			get
+			{
+				var configValue = ConfigurationManager.AppSettings["Sinj.RunAsUser"];
+
+				if (string.IsNullOrWhiteSpace(configValue))
+				{
+					return "sitecore\\admin";
+				}
+
+				return configValue;
+			}
 		}
 	}
 }
