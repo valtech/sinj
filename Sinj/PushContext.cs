@@ -1,4 +1,5 @@
 ﻿using Microsoft.ClearScript;
+using Sitecore.Security.Accounts;
 using Sitecore.SecurityModel;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,42 @@ namespace Sinj
 			response.Write(String.Format("{1:D4} - {0}\r\n", message, (int)duration.TotalSeconds));
 
 			response.Flush();
+		}
+
+		[ScriptMember(Name = "runAsUser")]
+		public void RunAsUser(string username)
+		{
+			if (string.IsNullOrWhiteSpace(username))
+			{
+				return;
+			}
+
+			if (UserSwitcher.CurrentValue != null)
+			{
+				UserSwitcher.Exit();
+			}
+
+			Log(string.Format("Running as '{0}'", username));
+			UserSwitcher.Enter(User.FromName(username, true));
+		}
+
+		[ScriptMember(Name = "endRunAsUser")]
+		public void EndRunAsUser()
+		{
+			if (UserSwitcher.CurrentValue != null)
+			{
+				Log(string.Format("Finished running as '{0}'", UserSwitcher.CurrentValue.Name));
+				UserSwitcher.Exit();
+			}
+		}
+
+		[ScriptMember(Name = "hasUserContext")]
+		public bool HasUserContext
+		{
+			get
+			{
+				return UserSwitcher.CurrentValue != null;
+			}
 		}
 	}
 }

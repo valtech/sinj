@@ -321,7 +321,18 @@ var scDeleteItemById = function (itemId) {
     }
 };
 
+var scCheckForFieldUpdatesRequiringPrivilege = function (fieldName) {
+	// Need to run within the context of an admin user to make certain changes to base templates (see sitecore issue 470391). Check if running in the context of a user and throw error otherwise.
+	if (fieldName.toLowerCase() == 'base template' || fieldName.toLowerCase() == '__base template') {
+		if (!$sc.hasUserContext) {
+			throw new Error("Sitecore requires a user context to succesfully complete some Base Template operations. Specify a user to run as in your script using '$sc.runAsUser(username)'. The specified user must be able to update Base Templates (e.g. \"sitecore\\\\admin\"). The user context will end when the end of the current script is reached, or you call '$sc.endRunAsUser`, whichever comes first.");
+		}
+	}
+};
+
 function scUpdateSingleField(id, language, fieldName, value) {
+	scCheckForFieldUpdatesRequiringPrivilege(fieldName);
+
     var updatePackage =
     {
         item: scItemQuery(id),

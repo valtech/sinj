@@ -43,6 +43,12 @@ var scInsertTemplate = function (packet) {
 		}
 	}
 
+	if (item != null) {
+		for (var name in packet.fields) {
+			scCheckForFieldUpdatesRequiringPrivilege(name);
+		}
+	}
+
 	if (item == null) {
 		if (parentBranch == null) {
 			var parentTemplate = $sc.db.Templates.Item.get($scTemplateIDs.Template);
