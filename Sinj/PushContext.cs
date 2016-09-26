@@ -53,28 +53,19 @@ namespace Sinj
 		[ScriptMember(Name = "runAsUser")]
 		public void RunAsUser(string username)
 		{
-			if (string.IsNullOrWhiteSpace(username))
-			{
-				return;
-			}
-
-			if (UserSwitcher.CurrentValue != null)
-			{
-				UserSwitcher.Exit();
-			}
-
-			Log(string.Format("Running as '{0}'", username));
-			UserSwitcher.Enter(User.FromName(username, true));
-		}
-
-		[ScriptMember(Name = "endRunAsUser")]
-		public void EndRunAsUser()
-		{
 			if (UserSwitcher.CurrentValue != null)
 			{
 				Log(string.Format("Finished running as '{0}'", UserSwitcher.CurrentValue.Name));
 				UserSwitcher.Exit();
 			}
+
+			if (string.IsNullOrWhiteSpace(username))
+			{
+				return;
+			}
+
+			Log(string.Format("Running as '{0}'", username));
+			UserSwitcher.Enter(User.FromName(username, true));
 		}
 
 		[ScriptMember(Name = "hasUserContext")]

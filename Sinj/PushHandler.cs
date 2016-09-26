@@ -70,7 +70,7 @@ namespace Sinj
 
 								engine.Execute(script);
 
-								pushContext.EndRunAsUser();
+								pushContext.RunAsUser(null);
 							}
 						}
 
