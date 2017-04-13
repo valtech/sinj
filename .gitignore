@@ -1,6 +1,6 @@
-/Sinj/bin/Debug
+/Sinj/bin/
 /Sinj/obj
-/Sinj.CommandLine/bin/Debug
+/Sinj.CommandLine/bin/
 /Sinj.CommandLine/obj
 /packages
 *.user

@@ -12,8 +12,13 @@ namespace Sinj
 {
 	public class PushContext
 	{
-		private string _database = "master";
+		private string _database;
 		private DateTime _start = DateTime.Now;
+
+		public PushContext(string defaultDatabaseName = "master")
+		{
+			_database = defaultDatabaseName;
+		}
 
 		[ScriptMember(Name = "db")]
 		public Sitecore.Data.Database Database
